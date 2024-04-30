@@ -1,6 +1,8 @@
 from django.views import generic
 
 from product.models import Variant, Product
+from django.db.models import Q
+from datetime import datetime
 
 
 class CreateProductView(generic.TemplateView):
@@ -19,3 +21,41 @@ class ProductView(generic.ListView):
     template_name = 'products/list.html'
     context_object_name = 'products'
     paginate_by = 2
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        title = self.request.GET.get('title')
+        variant = self.request.GET.get('variant')
+        price_from = self.request.GET.get('price_from')
+        price_to = self.request.GET.get('price_to')
+        date = self.request.GET.get('date')
+
+        filters = Q()
+
+        if title:
+            filters &= Q(title__icontains=title)
+
+        if variant:
+            filters &= Q(productvariant__variant_title__icontains=variant)
+
+        if price_from:
+            filters &= Q(productvariantprice__price__gte=price_from)
+
+        if price_to:
+            filters &= Q(productvariantprice__price__lte=price_to)
+
+        if date:
+            try:
+                date = datetime.strptime(date, '%Y-%m-%d')
+                filters &= Q(created_at__date=date)
+            except ValueError:
+                pass  
+
+        queryset = queryset.filter(filters).distinct()
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+    
