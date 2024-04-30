@@ -18,3 +18,4 @@ class ProductView(generic.ListView):
     model = Product
     template_name = 'products/list.html'
     context_object_name = 'products'
+    paginate_by = 2
