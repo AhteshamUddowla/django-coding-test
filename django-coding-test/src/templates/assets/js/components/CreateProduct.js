@@ -2,9 +2,16 @@ import React, {useState} from 'react';
 import TagsInput from 'react-tagsinput';
 import 'react-tagsinput/react-tagsinput.css';
 import Dropzone from 'react-dropzone'
-
+import axios from 'axios';
+import {useHistory} from 'react-router';
 
 const CreateProduct = (props) => {
+
+    const [product, setProduct] = useState({
+        title: "",
+        sku: "",
+        description: ""
+    });
 
     const [productVariantPrices, setProductVariantPrices] = useState([])
 
@@ -14,6 +21,15 @@ const CreateProduct = (props) => {
             tags: []
         }
     ])
+
+    const history = useHistory()
+
+    // handle input change for product data
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setProduct({ ...product, [name]: value });
+    };
+
     console.log(typeof props.variants)
     // handle click event of the Add button
     const handleAddClick = () => {
@@ -75,9 +91,22 @@ const CreateProduct = (props) => {
     }
 
     // Save product
-    let saveProduct = (event) => {
+    let saveProduct = async(event) => {
         event.preventDefault();
         // TODO : write your code here to save the product
+        try {
+            const formData = new FormData();
+            formData.append('title', product.title);
+            formData.append('sku', product.sku);
+            formData.append('description', product.description);
+    
+            const response =  await axios.post('http://127.0.0.1:8000/api/', formData).then((response) => {
+                console.log(response.data);
+                history.push('/')
+            });
+        } catch (error) {
+            console.error('Error saving product:', error);
+        }
     }
 
 
@@ -90,15 +119,15 @@ const CreateProduct = (props) => {
                             <div className="card-body">
                                 <div className="form-group">
                                     <label htmlFor="">Product Name</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
+                                    <input type="text" id="title" name="title" value={product.title} onChange={handleInputChange} placeholder="Product Name" className="form-control"/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Product SKU</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
+                                    <input type="text" id="sku" name="sku" value={product.sku} onChange={handleInputChange} placeholder="Product Name" className="form-control"/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Description</label>
-                                    <textarea id="" cols="30" rows="4" className="form-control"></textarea>
+                                    <textarea id="description" name="description" value={product.description} onChange={handleInputChange} cols="30" rows="4" className="form-control"></textarea>
                                 </div>
                             </div>
                         </div>

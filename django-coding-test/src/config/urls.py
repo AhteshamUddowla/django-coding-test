@@ -18,13 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.decorators.cache import never_cache
 from django.views.static import serve
-
 from config import settings
+from product.views.product import ProductAPIView
+from rest_framework import routers
+
+route = routers.DefaultRouter()
+route.register('', ProductAPIView, basename='productview')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('authentication.urls')),
-    path('product/', include('product.urls'))
+    path('product/', include('product.urls')),
+    path('api/', include(route.urls)),
 ]
 
 if settings.DEBUG:

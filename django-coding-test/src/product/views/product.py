@@ -1,8 +1,9 @@
 from django.views import generic
-
 from product.models import Variant, Product, ProductVariant
+from rest_framework import viewsets
 from django.db.models import Q
 from datetime import datetime
+from product.serializers import ProductSerializers, VariantSerializers
 
 
 class CreateProductView(generic.TemplateView):
@@ -14,7 +15,6 @@ class CreateProductView(generic.TemplateView):
         context['product'] = True
         context['variants'] = list(variants.all())
         return context
-
 
 class ProductView(generic.ListView):
     model = Product
@@ -64,3 +64,9 @@ class ProductView(generic.ListView):
         context['unique_variants'] = unique_variants
         return context
     
+class ProductAPIView(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializers
+
+    def custom_action(self, request, *args, **kwargs):
+        pass
