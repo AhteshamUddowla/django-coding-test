@@ -1,6 +1,6 @@
 from django.views import generic
 
-from product.models import Variant, Product
+from product.models import Variant, Product, ProductVariant
 from django.db.models import Q
 from datetime import datetime
 
@@ -57,5 +57,10 @@ class ProductView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        variants = Variant.objects.all()
+        unique_variants = {}
+        for variant in variants:
+            unique_variants[variant.title] = ProductVariant.objects.filter(variant=variant).values_list('variant_title', flat=True).distinct()
+        context['unique_variants'] = unique_variants
         return context
     

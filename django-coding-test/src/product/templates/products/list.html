@@ -17,8 +17,12 @@
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-                        <option selected disabled>--Select A Variant--</option>
-
+                        {% for variant_title, product_variants in unique_variants.items %}
+                            <option disabled style="color: gray; font-weight: 900">{{ variant_title }}</option>
+                            {% for product_variant in product_variants %}
+                                <option>{{ product_variant }}</option>
+                            {% endfor %}
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -69,14 +73,17 @@
                                             </dt>
                                             <dd class="col-sm-9">
                                                 <dl class="row mb-0">
-                                                    <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                                    <dd class="col-sm-8 pb-0">InStock : 50.</dd>
+                                                    {% for ps in product.productvariantprice_set.all %}
+                                                    <dd class="col-sm-4 pb-0">Price : {{ps.price}}</dd>
+                                                    <dd class="col-sm-8 pb-0">InStock : {{ps.stock}}</dd>
+                                                    {% endfor %}
                                                 </dl>
                                             </dd>
                                             {% endfor %}
                                         </dl>
-                                    <button onclick="$('#variant_{{product.id}}').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
-                                    </button>
+                                        {% if product.productvariant_set.all.count > 2 %}
+                                        <button onclick="$('#variant_{{product.id}}').toggleClass('h-auto'); $(this).text($(this).text() === 'Show more' ? 'Show less' : 'Show more');" class="btn btn-sm btn-link">Show more</button>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
